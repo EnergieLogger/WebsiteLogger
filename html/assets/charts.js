@@ -39,7 +39,7 @@ var PhiOptions =
       }
     },
     noData: {
-        text: 'Geen gegevens gevonden',
+        text: 'Gegevens worden geladen dit duurt ongeveer 5 seconden!',
         align: 'center',
         verticalAlign: 'middle',
         offsetX: 0,
@@ -88,7 +88,7 @@ var options = {
         colors: ['#F44336']
     },
     noData: {
-        text: 'Geen gegevens gevonden!'
+        text: 'Gegevens worden geladen dit duurt ongeveer 5 seconden!'
     },
     title: {
         text: 'Spanning',
@@ -154,7 +154,7 @@ var options2 = {
         colors: ['#F44336']
     },
     noData: {
-        text: 'Geen gegevens gevonden!'
+        text: 'Gegevens worden geladen dit duurt ongeveer 5 seconden!'
     },
     title: {
         text: 'Stroom',
@@ -220,10 +220,76 @@ var options3 = {
         colors: ['#F44336']
     },
     noData: {
-        text: 'Geen gegevens gevonden!'
+        text: 'Gegevens worden geladen dit duurt ongeveer 5 seconden!'
     },
     title: {
         text: 'Vermogen',
+        align: 'left'
+    },
+    markers: {
+        size: 0
+    },
+    xaxis: {
+        type: "datetime",
+        labels: {
+            datetimeUTC: true
+        }
+    },
+    colors: ['#0FC53D'],
+    legend: {
+        show: true
+    },
+    theme: {
+        mode: 'dark'
+    },
+    fill: {
+        type: 'gradient',
+        gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.5,
+            opacityTo: 0,
+            stops: [0, 90, 100]
+        }
+    }
+};
+
+var options4 = {
+    series: [],
+    chart: {
+        id: 'realtime',
+        height: 350,
+        type: 'area',
+        foreColor: '#ffffff',
+        animations: {
+            enabled: true,
+            easing: 'easeinout',
+            dynamicAnimation: {
+                enabled: true,
+                speed: 500
+            }
+        },
+        toolbar: {
+            show: true
+        },
+        zoom: {
+            enabled: true
+        }
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        curve: 'smooth'
+    },
+    fill: {
+        colors: ['#F44336']
+    },
+    noData: {
+        text: 'Gegevens worden geladen dit duurt ongeveer 5 seconden!'
+    },
+    title: {
+        text: 'Verbruik',
         align: 'left'
     },
     markers: {
@@ -262,12 +328,15 @@ chart2.render();
 var chart3 = new ApexCharts(document.querySelector("#chart3"), options3);
 chart3.render();
 
+var chart4 = new ApexCharts(document.querySelector("#chart4"), options4);
+chart4.render();
+
 var CosphiChart = new ApexCharts(document.querySelector("#cosPhiChart"), PhiOptions);
 CosphiChart.render();
 
 async function getData() {
     return new Promise(resolve => {
-        axios({ method: 'GET', url: "/assets/json_data.json" }).then(async function (response) {
+        axios({ method: 'GET', url: "/assets/json_data.json"}).then(async function (response) {
             try {
                 resolve(response.data)
             } catch (e) {
@@ -283,13 +352,12 @@ async function getData() {
         let jsonData = await getData();
         let Topwaarde_spanning = []
         for (var i = 0; i < jsonData["Data"].length; i++) {
-            Topwaarde_spanning.push({ "y": jsonData["Data"][i]["Topwaarde werkelijk"], "x": jsonData["Data"][i]["Tijd"] * 1000 })
+            Topwaarde_spanning.push({ "y": jsonData["Data"][i]["Effectief gemeten spanning"], "x": jsonData["Data"][i]["Tijd"] * 1000 })
         }
         chart.updateSeries([{
-            name: 'Topwaarde werkelijk',
+            name: 'Effectief gemeten spanning',
             data: Topwaarde_spanning
         }])
-
     }, 5000)
 
 })();
@@ -317,8 +385,23 @@ async function getData() {
         Vermogen.push({ "y": jsonData["Data"][i]["Vermogen"], "x": jsonData["Data"][i]["Tijd"] * 1000 })
     }
     chart3.updateSeries([{
-        name: 'Stroom',
+        name: 'Vermogen',
         data: Vermogen
+    }])
+}, 5000)
+
+})();
+
+(async () => {
+    setInterval(async function(){
+    let jsonData = await getData();
+    let Verbruik = []
+    for (var i = 0; i < jsonData["Data"].length; i++) {
+        Verbruik.push({ "y": jsonData["Data"][i]["Stroom"], "x": jsonData["Data"][i]["Tijd"] * 1000 })
+    }
+    chart4.updateSeries([{
+        name: 'Verbruik',
+        data: Verbruik
     }])
 }, 5000)
 
