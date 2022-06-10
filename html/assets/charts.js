@@ -397,7 +397,7 @@ async function getData() {
     let jsonData = await getData();
     let Verbruik = []
     for (var i = 0; i < jsonData["Data"].length; i++) {
-        Verbruik.push({ "y": jsonData["Data"][i]["Stroom"], "x": jsonData["Data"][i]["Tijd"] * 1000 })
+        Verbruik.push({ "y": jsonData["Data"][i]["Verbruik"], "x": jsonData["Data"][i]["Tijd"] * 1000 })
     }
     chart4.updateSeries([{
         name: 'Verbruik',
